@@ -10,6 +10,8 @@ import {AppRoutingModule} from "./app-routing.module";
 import {PageNotFoundComponent} from "./not-found.component";
 import {AuthGuard} from "./auth-guard.service";
 import {AuthService} from "./auth.service";
+import {SimpleNotificationsModule} from "angular2-notifications/dist";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 @NgModule({
   declarations: [
@@ -21,7 +23,9 @@ import {AuthService} from "./auth.service";
     BrowserModule,
     FormsModule,
     HttpModule,
-    AppRoutingModule
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    SimpleNotificationsModule.forRoot()
   ],
   providers: [
     Logger,

@@ -1,8 +1,9 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, NgZone, OnInit} from "@angular/core";
 import {Logger} from "angular2-logger/core";
 import {AuthService} from "../auth.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import "rxjs/Rx";
+import {NotificationsService} from "angular2-notifications/dist";
 
 declare const gapi: any;
 
@@ -14,17 +15,20 @@ export class LoginComponent implements OnInit {
   constructor(private logger: Logger,
               private authService: AuthService,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private notificationsService: NotificationsService,
+              private zone: NgZone
+  ) {
   }
 
   ngOnInit(): void {
-    this.logger.info(document.readyState);
     if ((<any>window).gapi != undefined) {
       this.setupGoogleSignInButton()
     }
 
+
     (<any> window).onGoogleApiLoaded = () => {
-      this.setupGoogleSignInButton()
+        this.setupGoogleSignInButton()
     }
   }
 
@@ -38,7 +42,9 @@ export class LoginComponent implements OnInit {
       gapi.signin2.render("google-sign-in-btn", {
         scope: "openid email profile",
         onsuccess: async(googleUser: any) => {
-          await this.onGoogleSignedIn(googleUser)
+          this.zone.run(async() => {
+            await this.onGoogleSignedIn(googleUser)
+          })
         }
       });
 
@@ -53,17 +59,25 @@ export class LoginComponent implements OnInit {
     let name = profile.getName();
     this.logger.info(`Signed in with Google as ${name} (${email})`);
 
-    // gapi.auth2.getAuthInstance().signOut();
+    gapi.auth2.getAuthInstance().signOut();
 
-    await this.authService.login(idToken);
     //TODO: Catch login error
+
+    try {
+      await this.authService.login(idToken);
+    } catch (e) {
+      let errData = e.json();
+      this.notificationsService.error("Login failed", `${e.status}: ${errData.error_description}`);
+      this.logger.error(`Login Failed`, errData);
+      return
+    }
 
     let redirectUrl = await this.route.queryParams
       .map(params => params['continue'] || '/')
       .first()
       .toPromise();
-
     this.logger.info(`Login succeed. Redirecting to ${redirectUrl}`);
     await this.router.navigate([redirectUrl]);
+    this.notificationsService.info("Login succeed", `Logged in as ${email}`);
   }
 }
