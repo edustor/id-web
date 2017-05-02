@@ -21,11 +21,9 @@ export class AuthService {
     formData.append("password", googleIdToken);
     formData.append("scope", "interactive token-issue");
 
-    let token = await this.http.post("http://localhost:8081/oauth2/token", formData)
+    this.accessToken = await this.http.post("http://localhost:8081/oauth2/token", formData)
       .map(response => response.json() as AuthToken)
       .toPromise();
-
-    this.accessToken = token;
 
     return true
   }
