@@ -8,6 +8,8 @@ import {LoginComponent} from "./login/login.component";
 import {Logger} from "angular2-logger/core";
 import {AppRoutingModule} from "./app-routing.module";
 import {PageNotFoundComponent} from "./not-found.component";
+import {AuthGuard} from "./auth-guard.service";
+import {AuthService} from "./auth.service";
 
 @NgModule({
   declarations: [
@@ -21,7 +23,11 @@ import {PageNotFoundComponent} from "./not-found.component";
     HttpModule,
     AppRoutingModule
   ],
-  providers: [Logger],
+  providers: [
+    Logger,
+    AuthGuard,
+    AuthService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

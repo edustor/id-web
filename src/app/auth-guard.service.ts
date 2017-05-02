@@ -7,7 +7,7 @@ export class AuthGuard implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    this.router.navigate(["/login"]);
+    this.router.navigate(["/login"], {queryParams: {"continue": "/settings"}});
     return false
   }
 }
