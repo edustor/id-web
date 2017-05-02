@@ -1,6 +1,8 @@
 import {Component, OnInit} from "@angular/core";
 import {Logger} from "angular2-logger/core";
 import {AuthService} from "../auth.service";
+import {ActivatedRoute, Router} from "@angular/router";
+import "rxjs/Rx";
 
 declare const gapi: any;
 
@@ -9,7 +11,10 @@ declare const gapi: any;
 })
 export class LoginComponent implements OnInit {
 
-  constructor(private logger: Logger, private authService: AuthService) {
+  constructor(private logger: Logger,
+              private authService: AuthService,
+              private router: Router,
+              private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
@@ -32,8 +37,8 @@ export class LoginComponent implements OnInit {
 
       gapi.signin2.render("google-sign-in-btn", {
         scope: "openid email profile",
-        onsuccess: (googleUser: any) => {
-          this.onGoogleSignedIn(googleUser)
+        onsuccess: async(googleUser: any) => {
+          await this.onGoogleSignedIn(googleUser)
         }
       });
 
@@ -41,7 +46,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  onGoogleSignedIn(googleUser: any) {
+  async onGoogleSignedIn(googleUser: any) {
     let idToken = googleUser.getAuthResponse().id_token;
     let profile = googleUser.getBasicProfile();
     let email = profile.getEmail();
@@ -50,6 +55,15 @@ export class LoginComponent implements OnInit {
 
     // gapi.auth2.getAuthInstance().signOut();
 
-    this.authService.login(idToken)
+    await this.authService.login(idToken);
+    //TODO: Catch login error
+
+    let redirectUrl = await this.route.queryParams
+      .map(params => params['continue'] || '/')
+      .first()
+      .toPromise();
+
+    this.logger.info(`Login succeed. Redirecting to ${redirectUrl}`);
+    await this.router.navigate([redirectUrl]);
   }
 }
