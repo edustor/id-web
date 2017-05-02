@@ -6,7 +6,22 @@ import "rxjs/Rx";
 @Injectable()
 export class AuthService {
 
-  accessToken: AuthToken = null;
+  set accessToken(accessToken: AuthToken) {
+    let data = JSON.stringify(accessToken);
+    this.logger.debug(`Setting accessToken: ${data}`);
+    localStorage["accessToken"] = data
+  }
+
+  get accessToken(): AuthToken {
+    let data = localStorage["accessToken"];
+    this.logger.debug(`Getting accessToken: ${data}`);
+
+    if (data == undefined) {
+      return null
+    }
+    let token = JSON.parse(data) as AuthToken;
+    return token;
+  }
 
   constructor(private logger: Logger, private http: Http) {
   }
@@ -21,12 +36,11 @@ export class AuthService {
     formData.append("password", googleIdToken);
     formData.append("scope", "interactive token-issue");
 
-    this.accessToken = await this.http.post("http://localhost:8081/oauth2/token", formData)
+    this.accessToken = await this.http.post("https://accounts.edustor.ru/oauth2/token", formData)
       .map(
         response => {
           let token = response.json() as AuthToken;
-          token.expires_at = new Date();
-          token.expires_at.setSeconds(token.expires_at.getSeconds() + token.expires_in - 10);
+          token.expires_at = new Date().getTime() + (token.expires_in - 10) * 1000;
           return token
         }
       )
@@ -39,6 +53,6 @@ export class AuthService {
 class AuthToken {
   token: string;
   expires_in: number;
-  expires_at: Date;
+  expires_at: number;
   scope: string;
 }

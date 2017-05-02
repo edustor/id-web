@@ -8,7 +8,7 @@ export class AuthGuard implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    if (this.authService.accessToken && this.authService.accessToken.expires_at > new Date()) {
+    if (this.authService.accessToken && new Date(this.authService.accessToken.expires_at) > new Date()) {
       return true
     }
 
