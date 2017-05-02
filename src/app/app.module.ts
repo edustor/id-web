@@ -5,13 +5,8 @@ import {HttpModule} from "@angular/http";
 
 import {AppComponent} from "./app.component";
 import {LoginComponent} from "./login/login.component";
-import {RouterModule, Routes} from "@angular/router";
 import {Logger} from "angular2-logger/core";
-
-const appRoutes: Routes = [
-  {path: "login", component: LoginComponent},
-  {path: '', redirectTo: '/login', pathMatch: 'full'}
-];
+import {AppRoutingModule} from "./app-routing.module";
 
 @NgModule({
   declarations: [
@@ -22,7 +17,7 @@ const appRoutes: Routes = [
     BrowserModule,
     FormsModule,
     HttpModule,
-    RouterModule.forRoot(appRoutes)
+    AppRoutingModule
   ],
   providers: [Logger],
   bootstrap: [AppComponent]
