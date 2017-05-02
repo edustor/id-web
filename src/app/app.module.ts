@@ -7,10 +7,12 @@ import {AppComponent} from "./app.component";
 import {LoginComponent} from "./login/login.component";
 import {Logger} from "angular2-logger/core";
 import {AppRoutingModule} from "./app-routing.module";
+import {PageNotFoundComponent} from "./not-found.component";
 
 @NgModule({
   declarations: [
     AppComponent,
+    PageNotFoundComponent,
     LoginComponent
   ],
   imports: [
