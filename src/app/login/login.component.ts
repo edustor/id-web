@@ -31,6 +31,7 @@ export class LoginComponent implements OnInit {
       });
 
       gapi.signin2.render("google-sign-in-btn", {
+        scope: "openid email profile",
         onsuccess: (googleUser: any) => {
           this.onGoogleSignedIn(googleUser)
         }
@@ -46,6 +47,8 @@ export class LoginComponent implements OnInit {
     let email = profile.getEmail();
     let name = profile.getName();
     this.logger.info(`Signed in with Google as ${name} (${email})`);
+
+    // gapi.auth2.getAuthInstance().signOut();
 
     this.authService.login(idToken)
   }
